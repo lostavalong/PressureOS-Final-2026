@@ -1,0 +1,190 @@
+<view class="page-shell task-page">
+  <app-header title="{{task ? task.name : '任务'}}" subtitle="{{template ? template.name : '正在加载'}}" back="{{true}}" action-text="更多" bind:action="taskMenu"></app-header>
+
+  <view wx:if="{{task}}" class="task-overview card">
+    <view class="overview-top">
+      <view class="overview-icon" style="color:{{task.accent}};background:{{task.accent}}14">{{template.icon || 'T'}}</view>
+      <view class="flex-1"><text class="overview-template">{{task.templateName}}</text><view class="save-state"><view class="save-check">✓</view><text>{{autoSaveText}}</text></view></view>
+      <text class="overview-progress number-font">{{task.progress}}%</text>
+    </view>
+    <view class="overview-track"><view class="overview-fill" style="width:{{task.progress}}%;background:{{task.accent}}"></view></view>
+  </view>
+
+  <view wx:if="{{task}}" class="stage-nav">
+    <button wx:for="{{stages}}" wx:key="id" class="stage-item {{selectedStage === item.id ? 'stage-item--active' : ''}} {{maxUnlockedStage >= item.id ? '' : 'stage-item--locked'}}" data-stage="{{item.id}}" bindtap="selectStage">
+      <view class="stage-circle">{{maxUnlockedStage > item.id ? '✓' : item.id + 1}}</view>
+      <text class="stage-title">{{item.title}}</text>
+      <text class="stage-caption">{{item.caption}}</text>
+      <view wx:if="{{stages.length - 1 > index}}" class="stage-connector {{maxUnlockedStage > item.id ? 'stage-connector--done' : ''}}"></view>
+    </button>
+  </view>
+
+  <view wx:if="{{task}}" class="swipe-tip">左右轻扫可切换已解锁阶段</view>
+
+  <view class="stage-content" bindtouchstart="touchStart" bindtouchend="touchEnd">
+    <view wx:if="{{task ? selectedStage === 0 : false}}" class="intro-stage">
+      <view class="intro-hero" style="background:linear-gradient(135deg,{{task.accent}} 0%,{{task.accent}}CC 100%)">
+        <text class="intro-eyebrow">开始前先了解任务</text>
+        <text class="intro-title">{{template.name}}</text>
+        <text class="intro-copy">{{template.intro || template.description}}</text>
+        <view class="intro-meta"><text>{{template.duration}}</text><text>·</text><text>{{task.targetPoints}} 个目标点</text><text>·</text><text>{{template.difficulty}}</text></view>
+      </view>
+
+      <view class="section-head"><view><view class="section-title">操作流程</view><view class="section-caption">系统会在每一步给出提示</view></view></view>
+      <view class="workflow-card card">
+        <view wx:for="{{template.workflow}}" wx:key="title" class="workflow-row">
+          <view class="workflow-axis"><view class="workflow-index" style="color:{{task.accent}};background:{{task.accent}}13">{{index + 1}}</view><view wx:if="{{template.workflow.length - 1 > index}}" class="workflow-line"></view></view>
+          <view class="workflow-main"><text class="workflow-title">{{item.title}}</text><text class="workflow-detail">{{item.detail}}</text></view>
+        </view>
+      </view>
+
+      <view class="section-head"><view><view class="section-title">数据处理</view><view class="section-caption">完成测量后自动执行</view></view></view>
+      <view class="analysis-methods">
+        <view wx:for="{{template.analysisMethods}}" wx:key="*this" class="method-chip"><view class="method-dot" style="background:{{task.accent}}"></view><text>{{item}}</text></view>
+      </view>
+
+      <view class="section-head"><view><view class="section-title">安全注意</view><view class="section-caption">模板提示不能替代硬件保护</view></view></view>
+      <view class="safety-card">
+        <view class="safety-head"><view class="safety-shield">!</view><text>开始前请逐项确认</text></view>
+        <view wx:for="{{template.safety}}" wx:key="*this" class="safety-row"><view class="safety-bullet"></view><text>{{item}}</text></view>
+      </view>
+
+      <view class="section-head"><view><view class="section-title">准备确认</view><view class="section-caption">你的进度会自动保存</view></view></view>
+      <view class="check-list card">
+        <view wx:for="{{prepChecks}}" wx:key="id" class="check-row" data-id="{{item.id}}" bindtap="togglePrep">
+          <view class="check-box {{item.checked ? 'check-box--on' : ''}}">{{item.checked ? '✓' : ''}}</view><text>{{item.label}}</text>
+        </view>
+      </view>
+      <button class="primary-btn stage-main-btn" disabled="{{maxUnlockedStage === 0 ? !prepReady : false}}" bindtap="startTask">{{maxUnlockedStage > 0 ? '返回数据记录' : '准备完成，开始测量'}}</button>
+    </view>
+
+    <view wx:elif="{{task ? selectedStage === 1 : false}}" class="record-stage">
+      <view class="live-readout card">
+        <view class="live-readout-top">
+          <view><view class="row live-title-row"><view class="online-pulse"></view><text>当前补偿压力</text></view><view class="live-value-line"><text class="live-value number-font">{{measurement.pressureDisplay}}</text><text class="live-unit">kPa</text></view></view>
+          <status-pill label="{{measurement.stable ? '读数稳定' : '等待稳定'}}" tone="{{measurement.stable ? 'green' : 'orange'}}"></status-pill>
+        </view>
+        <view class="live-chart"><mini-chart points="{{chartPoints}}" grid="{{false}}"></mini-chart></view>
+        <view class="live-footer"><text>温度 {{measurement.temperatureC}} ℃</text><text>设备序号 {{measurement.sequence}}</text><text>{{streamState === 'connected' ? '实时' : '重连中'}}</text></view>
+      </view>
+
+      <view class="capture-card card">
+        <view class="capture-head"><view><text class="capture-title">记录第 {{task.completedPoints + 1}} 个数据点</text><text class="capture-copy">输入外部变量，再采用当前稳定压力</text></view><view class="point-badge">{{task.completedPoints}} / {{task.targetPoints}}</view></view>
+        <label class="field-label">{{template.variableName || '外部变量'}}（{{template.variableUnit || '无单位'}}）</label>
+        <view class="external-input-row">
+          <view class="external-field"><input type="digit" value="{{externalValue}}" bindinput="inputExternal" placeholder="{{template.variablePlaceholder || '请输入数值'}}" /><text>{{template.variableUnit}}</text></view>
+        </view>
+        <view class="suggestion-row"><text class="suggestion-label">快捷值</text><button wx:for="{{suggestions}}" wx:key="*this" data-value="{{item}}" bindtap="useSuggestion">{{item}} {{template.variableUnit}}</button></view>
+        <view class="capture-preview">
+          <view><text>将同时记录</text><text class="preview-value">{{measurement.pressureDisplay}} kPa</text></view>
+          <view><text>数据来源</text><text class="preview-value">手机输入 ＋ 仪表稳定值</text></view>
+        </view>
+        <button class="primary-btn capture-btn" loading="{{savingPoint}}" disabled="{{savingPoint || !measurement.stable || externalValue === ''}}" bindtap="addPoint">
+          {{savingPoint ? '正在保存…' : measurement.stable ? '采用当前稳定读数' : '等待压力稳定'}}
+        </button>
+      </view>
+
+      <view class="section-head"><view><view class="section-title">实验数据</view><view class="section-caption">错误数据可删除并重新测量</view></view><text class="section-action">{{task.completedPoints}} 点</text></view>
+      <view wx:if="{{task.points.length}}" class="data-table card">
+        <view class="table-head"><text>序号</text><text>{{template.variableName}}</text><text>压力/kPa</text><text>操作</text></view>
+        <view wx:for="{{task.points}}" wx:key="id" class="table-row">
+          <view class="point-index">{{item.index}}</view>
+          <view><text class="cell-value number-font">{{item.externalText}}</text><text class="cell-unit">{{item.externalUnit}}</text></view>
+          <view><text class="cell-value number-font">{{item.pressureText}}</text><text class="cell-sub">{{item.temperatureText}} ℃ · {{item.timeText}}</text></view>
+          <button class="delete-point" data-id="{{item.id}}" bindtap="removePoint">×</button>
+        </view>
+      </view>
+      <view wx:else class="no-points"><view class="no-points-icon">＋</view><text>还没有数据点</text><text>输入外部变量并采用当前稳定读数</text></view>
+
+      <view class="completion-card {{task.missingPoints === 0 ? 'completion-card--ready' : ''}}">
+        <view class="completion-icon">{{task.missingPoints === 0 ? '✓' : task.completedPoints}}</view>
+        <view class="flex-1"><text class="completion-title">{{task.missingPoints === 0 ? '数据已达到模板要求' : '继续完成数据采集'}}</text><text class="completion-copy">{{task.missingPoints === 0 ? '可以进入自动拟合与误差分析' : '还需要 ' + task.missingPoints + ' 个有效数据点'}}</text></view>
+      </view>
+      <button class="primary-btn stage-main-btn" disabled="{{task.missingPoints > 0}}" bindtap="finishMeasurement">完成测量并进入分析</button>
+    </view>
+
+    <view wx:elif="{{task ? selectedStage === 2 : false}}" class="analysis-stage">
+      <view wx:if="{{analysisLoading}}" class="analysis-loading card"><view class="loading-orb"></view><text>正在根据模板计算拟合与不确定度…</text></view>
+      <block wx:elif="{{analysis}}">
+        <view class="analysis-summary">
+          <view><text class="analysis-eyebrow">自动分析完成</text><text class="analysis-title">数据关系清晰，拟合结果可审核</text></view>
+          <status-pill label="{{analysis.outlierCount ? analysis.outlierCount + ' 个疑点' : '未见粗大误差'}}" tone="{{analysis.outlierCount ? 'orange' : 'green'}}"></status-pill>
+        </view>
+
+        <view class="fit-card card">
+          <view class="fit-head"><view><text class="fit-title">线性拟合</text><text class="fit-subtitle">{{template.variableName}} → 压力</text></view><text class="algorithm-chip">{{analysis.algorithmId}}</text></view>
+          <view class="fit-equation number-font">{{analysis.equation}}</view>
+          <view class="fit-chart"><fit-chart points="{{task.points}}" analysis="{{analysis}}" accent="{{task.accent}}"></fit-chart></view>
+          <view class="fit-legend"><view><view class="legend-dot"></view><text>测量点</text></view><view><view class="legend-line"></view><text>拟合直线</text></view></view>
+        </view>
+
+        <view class="analysis-grid">
+          <view class="analysis-metric card"><text class="metric-label">相关系数 R</text><text class="metric-number number-font">{{analysis.rText}}</text><text class="metric-note">越接近 ±1 越强</text></view>
+          <view class="analysis-metric card"><text class="metric-label">决定系数 R²</text><text class="metric-number number-font">{{analysis.r2Text}}</text><text class="metric-note">模型解释程度</text></view>
+          <view class="analysis-metric card"><text class="metric-label">拟合 RMSE</text><text class="metric-number number-font">{{analysis.rmseText}}</text><text class="metric-note">kPa</text></view>
+          <view class="analysis-metric card"><text class="metric-label">有效点数</text><text class="metric-number number-font">{{analysis.n}}</text><text class="metric-note">本次数据快照</text></view>
+        </view>
+
+        <view class="section-head"><view><view class="section-title">不确定度概览</view><view class="section-caption">当前为模板定义的演示模型</view></view></view>
+        <view class="uncertainty-card card">
+          <view class="uncertainty-main"><text class="uncertainty-label">扩展不确定度 U（k=2）</text><view><text class="uncertainty-value number-font">{{analysis.expandedText}}</text><text> kPa</text></view></view>
+          <view class="uncertainty-rows">
+            <view><text>A类标准不确定度</text><text class="number-font">{{analysis.typeAText}} kPa</text></view>
+            <view><text>B类标准不确定度</text><text class="number-font">{{analysis.typeBText}} kPa</text></view>
+            <view><text>合成标准不确定度</text><text class="number-font">{{analysis.combinedText}} kPa</text></view>
+          </view>
+          <view class="uncertainty-note">正式版本会在结果中列出分量来源、分布假设、自由度、包含因子和算法版本。</view>
+        </view>
+
+        <view class="section-head"><view><view class="section-title">逐点残差</view><view class="section-caption">点击返回“记录”可删除并重测</view></view></view>
+        <view class="residual-card card">
+          <view class="residual-head"><text>点</text><text>实测值</text><text>拟合值</text><text>残差</text></view>
+          <view wx:for="{{analysis.residuals}}" wx:key="id" class="residual-row {{item.outlier ? 'residual-row--outlier' : ''}}">
+            <text>{{item.index}}</text><text class="number-font">{{item.actualText}}</text><text class="number-font">{{item.predictedText}}</text><text class="number-font">{{item.residualText}}</text>
+          </view>
+        </view>
+
+        <view class="analysis-advice {{analysis.outlierCount ? 'analysis-advice--warn' : ''}}">
+          <view class="advice-icon">{{analysis.outlierCount ? '!' : '✓'}}</view><view><text>{{analysis.outlierCount ? '请审核异常点' : '数据质量检查通过'}}</text><text>{{analysis.outlierCount ? '系统只标记嫌疑点，不会擅自删除原始数据。' : '必填字段、单位、范围和粗大误差预筛均已通过。'}}</text></view>
+        </view>
+        <button class="primary-btn stage-main-btn" bindtap="confirmAnalysis">确认分析并生成结果</button>
+      </block>
+    </view>
+
+    <view wx:elif="{{task ? selectedStage === 3 : false}}" class="result-stage">
+      <view class="result-hero">
+        <view class="result-check">✓</view>
+        <text class="result-eyebrow">{{task.status === 'completed' ? 'TASK COMPLETED' : 'READY TO EXPORT'}}</text>
+        <text class="result-title">{{task.status === 'completed' ? '任务已完成' : '结果已准备好'}}</text>
+        <text class="result-copy">数据、算法和设备版本已经形成可追溯快照。</text>
+      </view>
+
+      <view class="report-card card">
+        <view class="report-ribbon">PressureOS</view>
+        <view class="report-head"><view><text class="report-type">实验结果报告</text><text class="report-name">{{task.name}}</text></view><view class="report-code">PX<br/>01</view></view>
+        <view class="report-line"></view>
+        <view class="report-summary">
+          <view><text>有效数据</text><text class="number-font">{{task.completedPoints}} 点</text></view>
+          <view><text>拟合模型</text><text>{{analysis ? analysis.algorithmId : 'ols.v1'}}</text></view>
+          <view><text>设备</text><text>PX-01</text></view>
+          <view><text>标定版本</text><text>{{analysis ? analysis.calibrationVersion : 'CAL-2026-08-A'}}</text></view>
+        </view>
+        <view wx:if="{{analysis}}" class="report-equation"><text>核心结果</text><text class="number-font">{{analysis.equation}}</text><text>R² = {{analysis.r2Text}}　U(k=2) = {{analysis.expandedText}} kPa</text></view>
+        <view class="report-footer"><text>含原始数据 · 拟合图 · 残差 · 不确定度 · 审计信息</text><view class="report-stamp">可追溯</view></view>
+      </view>
+
+      <view wx:if="{{artifact}}" class="artifact-ready"><view class="artifact-icon">✓</view><view class="flex-1"><text>最近生成</text><text>{{artifact.fileName}}</text></view></view>
+
+      <view class="section-head"><view><view class="section-title">导出与分享</view><view class="section-caption">正式文件由树莓派生成</view></view></view>
+      <button class="primary-btn export-btn" loading="{{exporting}}" disabled="{{exporting}}" bindtap="chooseExport">生成结果文件</button>
+      <button class="secondary-btn share-btn" open-type="share">分享任务摘要</button>
+
+      <view class="result-files card">
+        <view><view class="file-icon file-icon--pdf">PDF</view><text>完整实验报告</text><text>流程、数据、分析与签名</text></view>
+        <view><view class="file-icon file-icon--csv">CSV</view><text>原始数据表</text><text>便于二次核查与归档</text></view>
+        <view><view class="file-icon file-icon--json">{ }</view><text>证据数据包</text><text>版本、算法与审计信息</text></view>
+      </view>
+      <button class="ghost-btn back-task-btn" bindtap="selectStage" data-stage="2">返回审核分析结果</button>
+    </view>
+  </view>
+</view>

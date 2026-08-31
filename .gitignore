@@ -1,0 +1,38 @@
+# Build outputs
+build/
+build-*/
+dist/
+Objects/
+Listings/
+DebugConfig/
+
+# IDE and local workspace
+.vscode/
+.idea/
+.vs/
+.eide/
+.cmsis/
+*.code-workspace
+*.uvguix.*
+*.uvoptx
+project.private.config.json
+
+# Runtime and generated files
+*.sqlite
+*.sqlite-*
+*.db
+*.log
+*.tmp
+*.bak
+*.pyc
+__pycache__/
+*.png
+*.jpg
+*.jpeg
+*.strace
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+

@@ -1,0 +1,4 @@
+<view class="pill pill--{{tone}}">
+  <view wx:if="{{dot}}" class="pill-dot"></view>
+  <text>{{label}}</text>
+</view>

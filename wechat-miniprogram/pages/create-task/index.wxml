@@ -1,0 +1,47 @@
+<view class="page-shell create-page">
+  <app-header title="新建任务" subtitle="选择模板并为本次实验命名" back="{{true}}"></app-header>
+
+  <view class="step-label"><text class="step-number">01</text><view><text class="step-title">选择任务模板</text><text class="step-copy">模板决定操作流程、数据字段和分析方法</text></view></view>
+  <scroll-view class="template-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="template-row">
+      <view wx:for="{{templates}}" wx:key="id" class="template-option {{selectedTemplateId === item.id ? 'template-option--active' : ''}}" style="border-color:{{selectedTemplateId === item.id ? item.accent : '#d7e5ef'}}" data-id="{{item.id}}" bindtap="selectTemplate">
+        <view class="option-icon" style="color:{{item.accent}};background:{{item.accent}}14">{{item.icon}}</view>
+        <text class="option-name">{{item.shortName}}</text>
+        <text class="option-category">{{item.category}}</text>
+        <view wx:if="{{selectedTemplateId === item.id}}" class="selected-mark" style="background:{{item.accent}}">✓</view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{selectedTemplate}}" class="template-preview card">
+    <view class="preview-accent" style="background:{{selectedTemplate.accent}}"></view>
+    <view class="preview-main">
+      <view class="row-between"><text class="preview-name">{{selectedTemplate.name}}</text><status-pill label="{{selectedTemplate.difficulty}}" tone="{{selectedTemplate.difficulty === '专业' ? 'violet' : 'blue'}}" dot="{{false}}"></status-pill></view>
+      <text class="preview-description">{{selectedTemplate.description}}</text>
+      <view class="preview-tags"><text wx:for="{{selectedTemplate.tags}}" wx:key="*this">{{item}}</text></view>
+      <view class="preview-meta"><text>{{selectedTemplate.duration}}</text><text>·</text><text>默认 {{selectedTemplate.targetPoints}} 个数据点</text></view>
+    </view>
+  </view>
+
+  <view class="step-label step-label--second"><text class="step-number">02</text><view><text class="step-title">设置本次任务</text><text class="step-copy">同一模板可创建多次，请用名称区分</text></view></view>
+  <view class="form-card card">
+    <label class="field-label">任务名称</label>
+    <view class="field-box {{nameFocused ? 'field-box--focus' : ''}}">
+      <input class="name-input" value="{{name}}" maxlength="32" bindinput="inputName" bindfocus="focusName" bindblur="blurName" placeholder="例如：第一组升压实验" />
+      <text class="char-count">{{name.length}}/32</text>
+    </view>
+    <text class="field-help">名称只用于区分本次任务，不会修改原模板。</text>
+
+    <view class="form-divider"></view>
+    <view class="row-between">
+      <view><text class="field-label point-label">目标数据点</text><text class="field-help field-help--block">达到后系统会建议进入分析阶段</text></view>
+      <view class="stepper"><button bindtap="decreasePoints">−</button><text class="number-font">{{targetPoints}}</text><button bindtap="increasePoints">＋</button></view>
+    </view>
+  </view>
+
+  <view class="save-note"><view class="save-icon">✓</view><text>创建后任务会自动保存在仪表端，可跨手机与仪表无缝继续。</text></view>
+
+  <button class="primary-btn create-submit" loading="{{submitting}}" disabled="{{submitting || !selectedTemplate || name.length === 0 || name.length === 1}}" bindtap="createTask">
+    {{submitting ? '正在创建…' : '创建并查看操作说明'}}
+  </button>
+</view>

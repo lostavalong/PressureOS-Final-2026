@@ -1,0 +1,8 @@
+.pill { height: 48rpx; padding: 0 18rpx; display: inline-flex; align-items: center; gap: 10rpx; border-radius: 18rpx; font-size: 21rpx; font-weight: 650; white-space: nowrap; }
+.pill-dot { width: 11rpx; height: 11rpx; border-radius: 50%; background: currentColor; box-shadow: 0 0 0 6rpx rgba(18,130,255,.08); }
+.pill--blue { color: #0b76e7; background: #e9f4ff; }
+.pill--green { color: #119d72; background: #e6f8f2; }
+.pill--orange { color: #d77a24; background: #fff2e5; }
+.pill--red { color: #d84961; background: #ffedf1; }
+.pill--violet { color: #6d59dc; background: #efedff; }
+.pill--gray { color: #607b94; background: #edf3f7; }

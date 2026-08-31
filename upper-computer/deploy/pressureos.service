@@ -1,0 +1,14 @@
+[Unit]
+Description=PressureOS touch application
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=/opt/pressureos/bin/pressureos --fullscreen --device-source auto
+Restart=on-failure
+RestartSec=2
+Environment=QT_QUICK_CONTROLS_STYLE=Basic
+
+[Install]
+WantedBy=graphical-session.target

@@ -1,0 +1,72 @@
+<block><view class="page-shell templates-page">
+  <app-header title="模板" subtitle="把复杂流程变成一步步引导" action-text="导入JSON" bind:action="showImport"></app-header>
+
+  <view class="template-hero">
+    <view class="hero-light"></view>
+    <view class="hero-content">
+      <text class="hero-eyebrow">TASK BLUEPRINTS</text>
+      <text class="hero-title">一次配置，规范完成每次测量</text>
+      <text class="hero-copy">模板封装操作说明、数据字段、稳定判据、计算方法与报告结构。</text>
+      <view class="hero-stats">
+        <view><text class="hero-number number-font">{{templates.length}}</text><text>已安装</text></view>
+        <view class="hero-divider"></view>
+        <view><text class="hero-number number-font">100%</text><text>本地校验</text></view>
+        <view class="hero-divider"></view>
+        <view><text class="hero-number number-font">0</text><text>任意代码</text></view>
+      </view>
+    </view>
+    <view class="blueprint-art"><view class="art-square art-square--one"></view><view class="art-square art-square--two"></view><view class="art-square art-square--three"></view><view class="art-line"></view></view>
+  </view>
+
+  <view class="search-box">
+    <view class="search-icon"></view>
+    <input class="search-input" value="{{keyword}}" bindinput="inputSearch" placeholder="搜索模板、方法或场景" placeholder-class="search-placeholder" />
+  </view>
+
+  <scroll-view class="category-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="category-row">
+      <button wx:for="{{categories}}" wx:key="*this" class="category-chip {{activeCategory === item ? 'category-chip--active' : ''}}" data-category="{{item}}" bindtap="chooseCategory">{{item}}</button>
+    </view>
+  </scroll-view>
+
+  <view class="section-head template-head">
+    <view><view class="section-title">{{activeCategory === '全部' ? '推荐模板' : activeCategory}}</view><view class="section-caption">{{visibleTemplates.length}} 个可用模板</view></view>
+  </view>
+
+  <view class="template-list">
+    <view wx:for="{{visibleTemplates}}" wx:key="id" class="template-card card" data-id="{{item.id}}" bindtap="createFromTemplate">
+      <view class="template-card-top">
+        <view class="template-icon" style="color:{{item.accent}};background:{{item.accent}}14">{{item.icon}}</view>
+        <view class="template-heading">
+          <view class="row-between"><text class="template-name">{{item.name}}</text><status-pill label="{{item.difficulty}}" tone="{{item.difficulty === '专业' ? 'violet' : 'green'}}" dot="{{false}}"></status-pill></view>
+          <text class="template-version">{{item.category}} · v{{item.version}}</text>
+        </view>
+      </view>
+      <text class="template-description">{{item.description}}</text>
+      <view class="template-tags"><text wx:for="{{item.tags}}" wx:key="*this">{{item}}</text></view>
+      <view class="template-bottom">
+        <view class="template-meta"><text>{{item.duration}}</text><text>·</text><text>{{item.targetPoints}} 个目标点</text></view>
+        <view class="use-template" style="color:{{item.accent}}">使用模板 <text>›</text></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="import-banner" bindtap="showImport">
+    <view class="import-icon"><text>{ }</text><view class="import-plus">＋</view></view>
+    <view class="flex-1"><text class="import-title">导入你的JSON模板</text><text class="import-copy">通过手机文件发送到仪表，自动完成安全校验</text></view>
+    <text class="chevron">›</text>
+  </view>
+</view>
+
+<view wx:if="{{showImportSheet}}" class="sheet-mask" bindtap="hideImport">
+  <view class="import-sheet" catchtap="stopBubble">
+    <view class="sheet-handle"></view>
+    <view class="sheet-head"><view><text class="sheet-title">导入任务模板</text><text class="sheet-subtitle">只接受符合 PressureOS Schema 的 JSON</text></view><button class="sheet-close" bindtap="hideImport">×</button></view>
+    <view class="security-flow">
+      <view wx:for="{{['读取文件','Schema校验','能力降级','确认安装']}}" wx:key="*this" class="security-step"><view class="flow-index">{{index + 1}}</view><text>{{item}}</text></view>
+    </view>
+    <view class="security-note"><view class="shield-mark">✓</view><text>模板不能包含JavaScript、Shell、SQL、网络地址或任意设备指令。正式校验由树莓派完成。</text></view>
+    <button class="primary-btn import-primary" loading="{{importing}}" disabled="{{importing}}" bindtap="chooseJsonFile">从微信文件选择JSON</button>
+    <button class="secondary-btn import-secondary" disabled="{{importing}}" bindtap="installExample">安装示例模板体验流程</button>
+  </view>
+</view></block>

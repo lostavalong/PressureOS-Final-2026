@@ -1,0 +1,11 @@
+.header { margin: 0 -4rpx; color: #0a294d; }
+.header--light { color: #fff; }
+.header-main { height: 102rpx; display: flex; align-items: center; padding-right: 188rpx; position: relative; }
+.back-btn { width: 70rpx; height: 70rpx; border-radius: 22rpx; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.82); border: 1rpx solid rgba(205,224,239,.8); box-shadow: 0 8rpx 20rpx rgba(32,75,112,.08); }
+.back-arrow { width: 18rpx; height: 18rpx; border-left: 4rpx solid #244966; border-bottom: 4rpx solid #244966; transform: rotate(45deg); margin-left: 8rpx; }
+.title-wrap { min-width: 0; margin-left: 20rpx; display: flex; flex-direction: column; justify-content: center; }
+.title-wrap--flush { margin-left: 4rpx; }
+.subtitle { margin-bottom: 1rpx; color: #67819a; font-size: 20rpx; }
+.title { max-width: 420rpx; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 38rpx; line-height: 1.16; font-weight: 760; letter-spacing: -1rpx; }
+.header--light .subtitle { color: rgba(255,255,255,.72); }
+.header-action { position: absolute; right: 188rpx; color: #0d7cf0; font-size: 25rpx; font-weight: 650; }

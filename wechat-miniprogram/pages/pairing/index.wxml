@@ -1,0 +1,51 @@
+<view class="pair-page">
+  <view class="pair-hero">
+    <app-header title="连接仪表" subtitle="安全的本地配对" back="{{true}}" light="{{true}}"></app-header>
+    <view class="pair-visual {{state === 'success' ? 'pair-visual--success' : ''}}">
+      <view class="radar-ring radar-ring--outer"></view><view class="radar-ring radar-ring--inner"></view>
+      <view class="phone-shape"><view class="phone-screen"><view class="scan-corners"><view></view><view></view><view></view><view></view></view></view></view>
+      <view class="signal-line"><view></view><view></view><view></view></view>
+      <view class="meter-shape"><view class="meter-display">{{state === 'success' ? '✓' : 'PX'}}</view><view class="meter-dot"></view></view>
+    </view>
+    <text class="pair-hero-title">{{state === 'success' ? '配对完成' : state === 'scanned' || state === 'confirming' ? '发现一台仪表' : '扫描仪表端二维码'}}</text>
+    <text class="pair-hero-copy">{{state === 'success' ? '手机已获得本次授权，可以安全查看数据并辅助完成任务。' : '在PressureOS仪表的“设备与连接”中打开动态配对码。'}}</text>
+  </view>
+
+  <view class="pair-content">
+    <view wx:if="{{state === 'ready'}}">
+      <view class="pair-steps card">
+        <view class="pair-step"><view class="step-index">1</view><view><text>让手机与仪表处于同一Wi-Fi</text><text>也可以连接仪表创建的临时热点</text></view></view>
+        <view class="step-line"></view>
+        <view class="pair-step"><view class="step-index">2</view><view><text>扫描仪表上的动态二维码</text><text>配对码和公钥指纹均有时效</text></view></view>
+        <view class="step-line"></view>
+        <view class="pair-step"><view class="step-index">3</view><view><text>在仪表端确认本机名称与权限</text><text>手机不能静默获得控制权限</text></view></view>
+      </view>
+      <button class="primary-btn scan-btn" bindtap="scanCode"><view class="scan-mini"><view></view><view></view><view></view><view></view></view>扫描配对二维码</button>
+      <button class="ghost-btn mock-btn" bindtap="useMockDevice">没有仪表？体验模拟配对</button>
+    </view>
+
+    <view wx:elif="{{state === 'scanned' || state === 'confirming'}}">
+      <view class="found-card card">
+        <view class="found-head"><view class="found-icon">PX</view><view class="flex-1"><text class="found-name">{{scanned.deviceId}} 精密压力模块</text><text class="found-endpoint">{{scanned.endpoint}}</text></view><status-pill label="待确认" tone="orange"></status-pill></view>
+        <view class="pair-code"><text class="code-label">仪表端配对码</text><text class="code-number number-font">{{scanned.pairingCode}}</text><text class="code-hint">请核对仪表屏幕显示一致</text></view>
+        <view class="fingerprint"><text>公钥指纹</text><text class="number-font">{{scanned.fingerprint}}</text></view>
+      </view>
+      <view class="permission-preview">
+        <text class="permission-preview-title">本机将申请</text>
+        <view class="permission-chip-row"><text>查看测量</text><text>查看任务</text><text>人工录入</text><text>安装模板</text></view>
+        <text class="permission-limit">不包含：归零、写标定参数、修改量程、解除联锁</text>
+      </view>
+      <button class="primary-btn confirm-btn" loading="{{pairing}}" disabled="{{pairing}}" bindtap="confirmPairing">{{pairing ? '等待仪表确认…' : '确认并向仪表申请授权'}}</button>
+      <button class="ghost-btn rescan-btn" disabled="{{pairing}}" bindtap="rescan">重新扫描</button>
+    </view>
+
+    <view wx:else class="success-panel">
+      <view class="success-check">✓</view>
+      <text class="success-title">PX-01 已安全连接</text>
+      <text class="success-copy">正式版本中写权限在15分钟无操作后失效，仪表端可随时撤销本机授权。</text>
+      <button class="primary-btn finish-btn" bindtap="finish">进入仪表首页</button>
+    </view>
+
+    <view class="privacy-note"><view class="lock-icon"></view><text>数据通过局域网HTTPS/WSS传输。模板和任务正式数据保存在仪表端，手机不直接访问SQLite。</text></view>
+  </view>
+</view>

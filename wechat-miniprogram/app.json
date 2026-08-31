@@ -1,0 +1,38 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/tasks/index",
+    "pages/templates/index",
+    "pages/device/index",
+    "pages/create-task/index",
+    "pages/task/index",
+    "pages/pairing/index"
+  ],
+  "window": {
+    "navigationStyle": "custom",
+    "backgroundColor": "#F3F8FD",
+    "backgroundTextStyle": "dark",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#6F879E",
+    "selectedColor": "#1282FF",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {"pagePath": "pages/home/index", "text": "仪表"},
+      {"pagePath": "pages/tasks/index", "text": "任务"},
+      {"pagePath": "pages/templates/index", "text": "模板"},
+      {"pagePath": "pages/device/index", "text": "设备"}
+    ]
+  },
+  "usingComponents": {
+    "app-header": "/components/app-header/index",
+    "status-pill": "/components/status-pill/index",
+    "mini-chart": "/components/mini-chart/index",
+    "fit-chart": "/components/fit-chart/index"
+  },
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=PressureOS
+Comment=智能精密压力测量任务中心
+Exec=/opt/pressureos/bin/pressureos --fullscreen
+Terminal=false
+X-GNOME-Autostart-enabled=true
+StartupNotify=false
+Categories=Science;Engineering;

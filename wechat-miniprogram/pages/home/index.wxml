@@ -1,0 +1,109 @@
+<view class="page-shell home-page">
+  <app-header title="仪表" subtitle="PressureOS Mobile"></app-header>
+
+  <view wx:if="{{device}}" class="device-strip">
+    <view class="device-avatar"><view class="avatar-line"></view><view class="avatar-dot"></view></view>
+    <view class="flex-1">
+      <view class="device-title-row">
+        <text class="device-title">{{device.id}}</text>
+        <view class="live-dot"></view>
+        <text class="device-live">{{streamState === 'connected' ? '实时连接' : '正在重连'}}</text>
+      </view>
+      <text class="device-subtitle">{{device.endpoint}} · {{device.mobileRateHz}} Hz</text>
+    </view>
+    <button class="device-more" bindtap="openDevice">管理</button>
+  </view>
+
+  <view wx:else class="device-strip device-strip--empty" bindtap="openPairing">
+    <view class="pair-icon">＋</view>
+    <view class="flex-1"><text class="device-title">连接附近仪表</text><text class="device-subtitle">扫描仪表端配对二维码</text></view>
+    <text class="chevron">›</text>
+  </view>
+
+  <view class="measure-card card">
+    <view class="measure-top">
+      <view>
+        <view class="measure-label-row"><view class="live-dot"></view><text class="measure-label">补偿后压力</text></view>
+        <view class="pressure-line">
+          <text class="pressure-value number-font">{{measurement.displayValue}}</text>
+          <picker range="{{unitOptions}}" value="{{unitIndex}}" bindchange="changeUnit">
+            <view class="unit-picker">{{unitOptions[unitIndex]}}<text class="picker-arrow">⌄</text></view>
+          </picker>
+        </view>
+      </view>
+      <view class="stable-orb {{measurement.stable ? 'stable-orb--ok' : 'stable-orb--wait'}}">
+        <view class="orb-mark">{{measurement.stable ? '✓' : '···'}}</view>
+        <text>{{measurement.stable ? '读数稳定' : '等待稳定'}}</text>
+      </view>
+    </view>
+
+    <view class="measure-meta">
+      <text>量程 {{device ? device.rangeMinKPa : -100}}～{{device ? device.rangeMaxKPa : 600}} kPa</text>
+      <text>·</text>
+      <text>使用 {{rangePercent}}%</text>
+    </view>
+    <view class="range-track"><view class="range-fill" style="width: {{rangePercent}}%"></view><view class="range-safe-mark"></view></view>
+
+    <view class="chart-head">
+      <view><text class="chart-title">实时趋势</text><text class="chart-caption">最近 4 秒 · 手机端抽稀</text></view>
+      <view class="legend"><view class="legend-line"></view><text>补偿值</text></view>
+    </view>
+    <view class="chart-wrap"><mini-chart points="{{chartPoints}}"></mini-chart></view>
+
+    <view class="source-row">
+      <picker class="source-picker" range="{{filterOptions}}" value="{{filterIndex}}" bindchange="changeFilter">
+        <view class="source-control"><view class="filter-glyph"><view></view><view></view><view></view></view><text>{{filterOptions[filterIndex]}}</text><text class="picker-arrow">⌄</text></view>
+      </picker>
+      <view class="read-only-hint">手机只读显示</view>
+    </view>
+  </view>
+
+  <view class="metric-grid">
+    <view class="metric-card card">
+      <view class="metric-icon metric-icon--orange">℃</view>
+      <text class="metric-name">传感器温度</text>
+      <view><text class="metric-value number-font">{{measurement.temperatureC}}</text><text class="metric-unit"> ℃</text></view>
+    </view>
+    <view class="metric-card card">
+      <view class="metric-icon metric-icon--green">≈</view>
+      <text class="metric-name">短时波动</text>
+      <view><text class="metric-value number-font">{{measurement.stability}}</text><text class="metric-unit"> kPa</text></view>
+    </view>
+    <view class="metric-card card">
+      <view class="metric-icon metric-icon--blue">Hz</view>
+      <text class="metric-name">设备采样率</text>
+      <view><text class="metric-value number-font">{{device ? device.sampleRateHz : 50}}</text><text class="metric-unit"> Hz</text></view>
+    </view>
+  </view>
+
+  <view class="section-head">
+    <view><view class="section-title">继续任务</view><view class="section-caption">随时从上次位置恢复</view></view>
+    <button class="section-action" bindtap="openTasks">全部任务</button>
+  </view>
+
+  <view wx:if="{{activeTask}}" class="active-task card" bindtap="openActiveTask">
+    <view class="task-accent" style="background: {{activeTask.accent}}"></view>
+    <view class="task-main">
+      <view class="row-between">
+        <status-pill label="{{activeTask.status === 'measuring' ? '待测数据' : '待数据分析'}}" tone="{{activeTask.status === 'measuring' ? 'blue' : 'orange'}}"></status-pill>
+        <text class="task-time">{{activeTask.completedPoints}} / {{activeTask.targetPoints}} 点</text>
+      </view>
+      <text class="task-name">{{activeTask.name}}</text>
+      <text class="task-template">{{activeTask.templateName}}</text>
+      <view class="task-progress"><view class="task-progress-fill" style="width: {{activeTask.progress}}%; background: {{activeTask.accent}}"></view></view>
+      <view class="row-between"><text class="task-next">下一步：{{activeTask.status === 'measuring' ? '补充外部变量并采集' : '审核拟合结果'}}</text><view class="round-next">›</view></view>
+    </view>
+  </view>
+
+  <view wx:else class="empty-task glass-card">
+    <view class="empty-symbol">＋</view>
+    <view class="flex-1"><text class="empty-title">还没有进行中的任务</text><text class="empty-subtitle">从经典模板开始一次规范测量</text></view>
+    <button class="secondary-mini" bindtap="openTasks">新建</button>
+  </view>
+
+  <view class="assistant-card">
+    <view class="assistant-orb"><view class="assistant-eye"></view><view class="assistant-eye"></view></view>
+    <view class="flex-1"><text class="assistant-title">需要帮助吗？</text><text class="assistant-copy">我会根据设备状态和任务阶段，告诉你下一步该做什么。</text></view>
+    <text class="chevron">›</text>
+  </view>
+</view>

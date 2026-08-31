@@ -1,0 +1,56 @@
+<view class="page-shell tasks-page">
+  <app-header title="任务" subtitle="按最后编辑时间排列" action-text="新建" bind:action="createTask"></app-header>
+
+  <view class="search-box">
+    <view class="search-icon"></view>
+    <input class="search-input" value="{{keyword}}" bindinput="inputSearch" placeholder="搜索任务或模板" placeholder-class="search-placeholder" />
+    <button wx:if="{{keyword}}" class="clear-btn" bindtap="clearSearch">×</button>
+  </view>
+
+  <scroll-view class="filter-scroll" scroll-x="{{true}}" enhanced="{{true}}" show-scrollbar="{{false}}">
+    <view class="filter-row">
+      <button wx:for="{{filters}}" wx:key="id" class="filter-chip {{activeFilter === item.id ? 'filter-chip--active' : ''}}" data-id="{{item.id}}" bindtap="chooseFilter">{{item.label}}</button>
+    </view>
+  </scroll-view>
+
+  <view class="task-summary">
+    <view><text class="summary-number number-font">{{visibleTasks.length}}</text><text class="summary-unit"> 个任务</text></view>
+    <view class="autosave"><view class="autosave-check">✓</view><text>所有更改自动保存</text></view>
+  </view>
+
+  <view wx:if="{{loading}}" class="skeleton-list">
+    <view wx:for="{{[1,2,3]}}" wx:key="*this" class="skeleton-card"><view class="skeleton-line skeleton-line--short"></view><view class="skeleton-line"></view><view class="skeleton-line skeleton-line--mid"></view></view>
+  </view>
+
+  <view wx:elif="{{visibleTasks.length}}" class="task-list">
+    <view wx:for="{{visibleTasks}}" wx:key="id" class="task-card card" data-id="{{item.id}}" bindtap="openTask">
+      <view class="task-color" style="background: {{item.accent}}"></view>
+      <view class="task-card-main">
+        <view class="task-card-top">
+          <status-pill label="{{item.statusLabel}}" tone="{{item.statusTone}}"></status-pill>
+          <button class="more-btn" data-id="{{item.id}}" catchtap="taskMenu"><view></view><view></view><view></view></button>
+        </view>
+        <text class="task-title">{{item.name}}</text>
+        <text class="task-origin">基于 {{item.templateName}}</text>
+        <view class="task-stats">
+          <view class="stat-cell"><text class="stat-label">已采集</text><text class="stat-value number-font">{{item.completedPoints}} / {{item.targetPoints}}</text></view>
+          <view class="stat-divider"></view>
+          <view class="stat-cell"><text class="stat-label">最后编辑</text><text class="stat-value">{{item.relativeTime}}</text></view>
+          <view class="stat-divider"></view>
+          <view class="stat-cell"><text class="stat-label">当前进度</text><text class="stat-value number-font">{{item.progress}}%</text></view>
+        </view>
+        <view class="progress-track"><view class="progress-fill" style="width: {{item.progress}}%; background: {{item.accent}}"></view></view>
+        <view class="task-card-bottom"><text>{{item.nextAction}}</text><view class="next-button" style="color: {{item.accent}}">›</view></view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="empty-state">
+    <view class="empty-illustration"><view class="empty-sheet"><view></view><view></view><view></view></view><view class="empty-plus">＋</view></view>
+    <text class="empty-title">没有找到任务</text>
+    <text class="empty-copy">{{keyword ? '换个关键词试试，或清除搜索条件' : '从模板创建任务，系统会保存你的每一步进度'}}</text>
+    <button class="primary-btn empty-action" bindtap="createTask">由模板新建任务</button>
+  </view>
+
+  <button wx:if="{{visibleTasks.length}}" class="floating-create" bindtap="createTask"><text class="floating-plus">＋</text><text>新建任务</text></button>
+</view>

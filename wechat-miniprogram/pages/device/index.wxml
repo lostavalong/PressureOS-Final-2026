@@ -1,0 +1,71 @@
+<view class="page-shell device-page">
+  <app-header title="设备" subtitle="连接、身份与权限"></app-header>
+
+  <view wx:if="{{device}}" class="identity-card">
+    <view class="identity-glow"></view>
+    <view class="identity-top">
+      <view class="device-cube"><view class="cube-screen"></view><view class="cube-dot"></view></view>
+      <view class="identity-main">
+        <view class="row"><text class="identity-name">{{device.name}}</text><view class="online-dot"></view></view>
+        <text class="identity-model">{{device.model}} · {{device.hardwareVersion}}</text>
+      </view>
+      <status-pill label="已配对" tone="green"></status-pill>
+    </view>
+    <view class="identity-status">
+      <view><text class="status-label">链路质量</text><text class="status-number number-font">{{device.linkQuality}}%</text></view>
+      <view class="quality-track"><view class="quality-fill" style="width:{{device.linkQuality}}%"></view></view>
+      <text class="status-good">优秀</text>
+    </view>
+    <view class="identity-chips"><text>CRC 正常</text><text>参数 {{device.calibrationVersion}}</text><text>{{device.sampleRateHz}} Hz</text></view>
+  </view>
+
+  <view wx:else class="identity-card identity-card--empty">
+    <text class="empty-title">尚未配对仪表</text><text class="empty-copy">请在仪表端打开小程序连接二维码。</text>
+  </view>
+
+  <view class="section-head"><view><view class="section-title">连接状态</view><view class="section-caption">小程序只连接树莓派，不直连STM32</view></view></view>
+  <view class="setting-group card">
+    <view class="setting-row" bindtap="showConnectionDetail">
+      <view class="setting-icon setting-icon--blue"><view class="wifi-wave">⌁</view></view>
+      <view class="setting-main"><text class="setting-title">Wi-Fi 局域网</text><text class="setting-copy">{{device ? device.endpoint : '未连接'}}</text></view>
+      <status-pill label="{{device ? '在线' : '离线'}}" tone="{{device ? 'green' : 'gray'}}"></status-pill><text class="setting-next">›</text>
+    </view>
+    <view class="setting-divider"></view>
+    <view class="setting-row">
+      <view class="setting-icon setting-icon--violet">B</view>
+      <view class="setting-main"><text class="setting-title">蓝牙辅助发现</text><text class="setting-copy">首版预留 · 不传输连续测量数据</text></view>
+      <status-pill label="预留" tone="violet" dot="{{false}}"></status-pill>
+    </view>
+    <view class="setting-divider"></view>
+    <view class="setting-row">
+      <view class="setting-icon setting-icon--cyan">API</view>
+      <view class="setting-main"><text class="setting-title">数据接口</text><text class="setting-copy">REST 查询 · WSS 实时推送</text></view>
+      <status-pill label="{{apiMode === 'mock' ? 'Mock' : 'Live'}}" tone="blue" dot="{{false}}"></status-pill>
+    </view>
+  </view>
+
+  <view class="section-head"><view><view class="section-title">设备信息</view><view class="section-caption">结果文件会携带这些版本快照</view></view></view>
+  <view class="info-grid card">
+    <view class="info-cell"><text>设备ID</text><text class="info-value">{{device ? device.id : '—'}}</text></view>
+    <view class="info-cell"><text>固件版本</text><text class="info-value">{{device ? device.firmwareVersion : '—'}}</text></view>
+    <view class="info-cell"><text>工作量程</text><text class="info-value">{{device ? device.rangeMinKPa + '～' + device.rangeMaxKPa + ' kPa' : '—'}}</text></view>
+    <view class="info-cell"><text>显示分辨力</text><text class="info-value">{{device ? device.resolutionKPa + ' kPa' : '—'}}</text></view>
+  </view>
+
+  <view class="section-head"><view><view class="section-title">本机权限</view><view class="section-caption">由仪表端按能力单独授予</view></view></view>
+  <view class="permission-list card">
+    <view wx:for="{{permissions}}" wx:key="code" class="permission-row" data-enabled="{{item.enabled}}" bindtap="explainPermission">
+      <view class="permission-mark {{item.enabled ? 'permission-mark--yes' : 'permission-mark--no'}}">{{item.enabled ? '✓' : '—'}}</view>
+      <view class="setting-main"><text class="permission-title">{{item.name}}</text><text class="permission-code">{{item.code}}</text></view>
+      <text class="permission-state {{item.enabled ? 'permission-state--yes' : ''}}">{{item.enabled ? '已授权' : '仅仪表端'}}</text>
+    </view>
+  </view>
+
+  <view class="security-card">
+    <view class="security-shield">✓</view>
+    <view class="flex-1"><text class="security-title">安全边界已启用</text><text class="security-copy">手机掉线不会中断仪表测量；手机无权解除硬件联锁或直接写入标定参数。</text></view>
+  </view>
+
+  <button class="secondary-btn diagnosis-btn" bindtap="runDiagnosis">运行连接诊断</button>
+  <button class="ghost-btn pairing-btn" bindtap="openPairing">重新扫描配对二维码</button>
+</view>

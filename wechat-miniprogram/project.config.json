@@ -1,0 +1,41 @@
+{
+  "appid": "wx1ed1718ef71b4302",
+  "projectname": "PressureOS-Mobile",
+  "description": "PressureOS 微信小程序交互原型",
+  "compileType": "miniprogram",
+  "miniprogramRoot": "./",
+  "setting": {
+    "useCompilerPlugins": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": false,
+    "urlCheck": false,
+    "checkSiteMap": true,
+    "coverView": true,
+    "lazyloadPlaceholderEnable": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "simulatorType": "wechat",
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
+}

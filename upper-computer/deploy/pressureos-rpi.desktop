@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PressureOS
+Name[zh_CN]=PressureOS
+Comment=智能精密压力测量任务中心
+Comment[zh_CN]=智能精密压力测量任务中心
+Exec=/home/yulinqvq/PressureOS_Current/PressureOS_Qt_Demo/scripts/launch_raspberry_pi_desktop.sh
+Icon=/home/yulinqvq/PressureOS_Current/PressureOS_Qt_Demo/deploy/pressureos-icon.svg
+Terminal=false
+StartupNotify=true
+Categories=Science;Engineering;

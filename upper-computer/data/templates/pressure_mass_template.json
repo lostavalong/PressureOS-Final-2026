@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0",
+  "templateId": "edu.pressure-mass.linear",
+  "name": "压力—质量关系实验",
+  "version": "1.0.0",
+  "category": "physics",
+  "description": {
+    "plainText": "质量由用户输入，压力由内置传感器稳定采集，系统完成线性拟合与图表输出。"
+  },
+  "variables": [
+    {"id": "mass", "name": "质量", "unit": "g", "source": {"preferred": ["manual.device", "manual.mobile"]}},
+    {"id": "pressure", "name": "稳定压力", "unit": "kPa", "source": {"preferred": ["builtin.pressure"]}}
+  ],
+  "workflow": [
+    {"id": "intro", "type": "instruction", "title": "检查装置并归零", "assistantArticle": "task_preparation"},
+    {"id": "massInput", "type": "input", "title": "填写本点质量", "assistantArticle": "capture_and_autosave"},
+    {"id": "pressureAcquire", "type": "acquire", "title": "等待稳定并采集压力", "assistantArticle": "measurement_stability"},
+    {"id": "calculate", "type": "calculate", "title": "完成统计与线性拟合", "assistantArticle": "fit_explanation"},
+    {"id": "export", "type": "export", "title": "生成图表和报告", "assistantArticle": "export_contents"}
+  ],
+  "assistantGuidance": {
+    "mode": "task-context",
+    "preparationChecklist": [
+      "检查压力接口与实验装置连接",
+      "确认质量值来源和单位可靠",
+      "在无载荷、零压且稳定状态下检查零点"
+    ],
+    "blockingConditions": [
+      "串口数据超时或数据库不可写",
+      "零点与标定参数尚未通过正式验收",
+      "压力进入量程警告或保护区",
+      "读数未达到稳定条件"
+    ],
+    "analysisExplanations": [
+      "同时解释斜率、截距、R²、残差和不确定度",
+      "异常点只提示人工复核，不允许自动删除",
+      "线性模型是否适用必须结合残差和物理关系判断"
+    ],
+    "troubleshooting": [
+      "长期不稳定时检查压力源脉动、泄漏、触碰和滤波设置",
+      "拟合较差时先核对质量录入和采集工况，再决定补测"
+    ]
+  },
+  "calculations": [
+    {"id": "fit", "operator": "linearRegression", "inputs": ["mass", "pressure"]},
+    {"id": "r", "operator": "pearsonR", "inputs": ["mass", "pressure"]},
+    {"id": "r2", "operator": "regressionR2", "inputs": ["fit"]}
+  ]
+}

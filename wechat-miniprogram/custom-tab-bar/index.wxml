@@ -1,0 +1,9 @@
+<cover-view class="tab-shell">
+  <cover-view class="tab-bar">
+    <cover-view wx:for="{{list}}" wx:key="pagePath" class="tab-item {{selected === index ? 'tab-item--active' : ''}}" data-index="{{index}}" bindtap="switchTab">
+      <cover-view class="icon-wrap"><cover-image class="tab-icon" src="{{item.icon}}"></cover-image></cover-view>
+      <cover-view class="tab-text">{{item.text}}</cover-view>
+    </cover-view>
+  </cover-view>
+  <cover-view class="safe-area"></cover-view>
+</cover-view>

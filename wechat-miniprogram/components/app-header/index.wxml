@@ -1,0 +1,12 @@
+<view class="header {{light ? 'header--light' : ''}}" style="padding-top: {{statusBarHeight}}px">
+  <view class="header-main">
+    <button wx:if="{{back}}" class="back-btn" bindtap="handleBack" aria-label="返回">
+      <view class="back-arrow"></view>
+    </button>
+    <view class="title-wrap {{back ? '' : 'title-wrap--flush'}}">
+      <text wx:if="{{subtitle}}" class="subtitle">{{subtitle}}</text>
+      <text class="title">{{title}}</text>
+    </view>
+    <button wx:if="{{actionText}}" class="header-action" bindtap="handleAction">{{actionText}}</button>
+  </view>
+</view>
